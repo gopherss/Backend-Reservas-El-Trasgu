@@ -11,13 +11,13 @@ export class AuthController {
         private readonly authService: AuthService
     ) { }
 
-    @Post('register')
+  /*   @Post('register')
     @ApiOperation({ summary: 'Registrar nuevo usuario' })
     @ApiResponse({ status: 201, description: 'Usuario registrado exitosamente' })
     @ApiResponse({ status: 400, description: 'Datos inválidos' })
     register(@Body() registerDto: RegisterDto) {
         return this.authService.register(registerDto);
-    }
+    } */
 
     @Post('login')
     @ApiOperation({ summary: 'Iniciar sesión' })

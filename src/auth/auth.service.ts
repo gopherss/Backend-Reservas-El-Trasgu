@@ -12,14 +12,14 @@ export class AuthService {
         private readonly jwt: JwtService
     ) { }
 
-    async register(registerDto: RegisterDto) {
+ /*    async register(registerDto: RegisterDto) {
         const hash = await bcrypt.hash(registerDto.password, 10);
         const user = await this.prismaService.user.create({
             data: { email: registerDto.email, password: hash },
         });
 
         return this.getTokens(user.id, user.email, user.role);
-    }
+    } */
 
     async login(loginDto: LoginDto) {
         const user = await this.prismaService.user.findUnique({ where: { email: loginDto.email } });
