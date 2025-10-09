@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RegisterDto, LoginDto, RefreshTokenDto, LogoutDto } from './dto';
@@ -12,14 +12,18 @@ export class AuthService {
         private readonly jwt: JwtService
     ) { }
 
- /*    async register(registerDto: RegisterDto) {
+/*     async register(registerDto: RegisterDto) {
+
+        const userWithEmailExists = await this.prismaService.user.findFirst({ where: { email: registerDto.email } });
+        if(userWithEmailExists) throw new BadRequestException("Ya existe un usuario con este correo electrónico");
+
         const hash = await bcrypt.hash(registerDto.password, 10);
         const user = await this.prismaService.user.create({
-            data: { email: registerDto.email, password: hash },
+            data: { email: registerDto.email, password: hash},
         });
 
         return this.getTokens(user.id, user.email, user.role);
-    } */
+    } */ 
 
     async login(loginDto: LoginDto) {
         const user = await this.prismaService.user.findUnique({ where: { email: loginDto.email } });

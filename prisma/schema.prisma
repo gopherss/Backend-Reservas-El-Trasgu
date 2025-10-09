@@ -26,6 +26,7 @@ model User {
 
 
 enum Role {
-  USER
-  ADMIN
+  ADMIN // acceso a todo
+  USER // acceso solo a reserveaciones y dashboard
+  PORTERO // acceso solo a lector de QR, listar la reserva
 }
