@@ -22,11 +22,37 @@ model User {
   status         Boolean @default(true)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  employee       Employee?
 }
 
 
 enum Role {
   ADMIN // acceso a todo
   USER // acceso solo a reserveaciones y dashboard
-  PORTERO // acceso solo a lector de QR, listar la reserva
+  PORTRESS // acceso solo a lector de QR, listar la reserva
+}
+
+
+model Employee {
+  id              Int @id @default(autoincrement())
+  nombre          String 
+  apellido        String
+  dni             String @unique
+  telefono        String
+  correo          String @unique
+  cargo           Cargo
+  fecha_ingreso   DateTime
+  fecha_registro  DateTime
+  estado          Boolean @default(true)
+  userId          Int @unique
+  user            User @relation(fields: [userId], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum Cargo {
+  ADMINISTRADOR 
+  ANFITRION
+  PORTERO
 }
