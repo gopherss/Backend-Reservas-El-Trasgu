@@ -12,43 +12,44 @@ export class AuthService {
         private readonly jwt: JwtService
     ) { }
 
-/*     async register(registerDto: RegisterDto) {
+   /* async register(registerDto: RegisterDto) {
 
-        const userWithEmailExists = await this.prismaService.user.findFirst({ where: { email: registerDto.email } });
+        const userWithEmailExists = await this.prismaService.user.findFirst({ where: { user: registerDto.user } });
         if(userWithEmailExists) throw new BadRequestException("Ya existe un usuario con este correo electrónico");
 
         const hash = await bcrypt.hash(registerDto.password, 10);
         const user = await this.prismaService.user.create({
-            data: { email: registerDto.email, password: hash},
+            data: { user: registerDto.user, password: hash},
         });
 
-        return this.getTokens(user.id, user.email, user.role);
-    } */ 
+        return this.getTokens(user.id, user.user, user.role);
+    } */
 
     async login(loginDto: LoginDto) {
-        const user = await this.prismaService.user.findUnique({ where: { email: loginDto.email } });
-        if (!user) throw new UnauthorizedException('Credenciales inválidas');
+        const userExits = await this.prismaService.user.findUnique({ where: { user: loginDto.user } });
+        if (!userExits) throw new UnauthorizedException('Credenciales inválidas');
+        if (!userExits.status) throw new UnauthorizedException('El usuario no está activo');
 
-        const valid = await bcrypt.compare(loginDto.password, user.password);
+        const valid = await bcrypt.compare(loginDto.password, userExits.password);
         if (!valid) throw new UnauthorizedException('Credenciales inválidas');
 
-        const tokens = await this.getTokens(user.id, user.email, user.role);
-        const refreshTokenDto: RefreshTokenDto = { userId: user.id, refreshToken: tokens.refresh_token }
+        const tokens = await this.getTokens(userExits.id, userExits.user, userExits.role);
+        const refreshTokenDto: RefreshTokenDto = { userId: userExits.id, refreshToken: tokens.refresh_token }
         await this.updateRefreshToken(refreshTokenDto);
 
         return tokens;
     }
 
     async refreshTokens(refreshTokenDto: RefreshTokenDto) {
-        const user = await this.prismaService.user.findUnique({ where: { id: refreshTokenDto.userId } });
-        if (!user || !user.refreshToken) throw new ForbiddenException();
+        const userExits = await this.prismaService.user.findUnique({ where: { id: refreshTokenDto.userId } });
+        if (!userExits || !userExits.refreshToken) throw new ForbiddenException();
 
-        const valid = await bcrypt.compare(refreshTokenDto.refreshToken, user.refreshToken);
+        const valid = await bcrypt.compare(refreshTokenDto.refreshToken, userExits.refreshToken);
         if (!valid) throw new ForbiddenException();
 
-        const tokens = await this.getTokens(user.id, user.email, user.role);
+        const tokens = await this.getTokens(userExits.id, userExits.user, userExits.role);
 
-        const refreshToken: RefreshTokenDto = { userId: user.id, refreshToken: tokens.refresh_token }
+        const refreshToken: RefreshTokenDto = { userId: userExits.id, refreshToken: tokens.refresh_token }
 
         await this.updateRefreshToken(refreshToken);
         return tokens;

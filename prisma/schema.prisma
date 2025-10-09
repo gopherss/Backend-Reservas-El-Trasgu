@@ -15,7 +15,7 @@ datasource db {
 
 model User {
   id             Int @id @default(autoincrement())
-  email          String @unique
+  user           String @unique
   password       String
   role           Role @default(USER)
   refreshToken   String? 
@@ -42,7 +42,6 @@ model Employee {
   correo          String @unique
   cargo           Cargo
   fecha_ingreso   DateTime
-  fecha_registro  DateTime
   estado          Boolean @default(true)
   userId          Int @unique
   user            User @relation(fields: [userId], references: [id])

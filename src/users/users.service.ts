@@ -9,13 +9,13 @@ export class UsersService {
   constructor(private readonly prismaService: PrismaService) { }
 
   async create(createUserDto: CreateUserDto): Promise<Omit<CreateUserDto, 'password'>> {
-    const exists = await this.prismaService.user.findUnique({ where: { email: createUserDto.email } });
+    const exists = await this.prismaService.user.findUnique({ where: { user: createUserDto.user } });
     if (exists) throw new BadRequestException('Email ya registrado');
 
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const user = await this.prismaService.user.create({
       data: {
-        email: createUserDto.email,
+        user: createUserDto.user,
         password: hashedPassword,
         role: createUserDto.role ?? 'USER',
       },
@@ -29,7 +29,7 @@ export class UsersService {
   async findAll() {
     return await this.prismaService.user.findMany({
       select: {
-        id: true, email: true, role: true, status: true, updatedAt: true
+        id: true, user: true, role: true, status: true, updatedAt: true
       }
     });
   }
@@ -37,7 +37,7 @@ export class UsersService {
   async findOne(id: number) {
     const user = await this.prismaService.user.findUnique({
       where: { id },
-      select: { id: true, email: true, role: true, status: true, updatedAt: true }
+      select: { id: true, user: true, role: true, status: true, updatedAt: true }
     });
     if (!user) throw new NotFoundException('Usuario no encontrado');
     return user;
@@ -55,7 +55,7 @@ export class UsersService {
     await this.prismaService.user.update({
       where: { id },
       data,
-      select: { id: true, email: true, role: true, status: true, createdAt: true, updatedAt: true }
+      select: { id: true, user: true, role: true, status: true, createdAt: true, updatedAt: true }
     });
   }
 

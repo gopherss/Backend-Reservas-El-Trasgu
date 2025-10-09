@@ -7,7 +7,7 @@ import { PrismaService } from 'src/prisma/prisma.service'; // Necesario para bus
 type JwtPayload = {
     sub: number;
     email: string;
-    role: 'USER' | 'ADMIN' | 'PORTERO';
+    role: 'USER' | 'ADMIN' | 'PORTRESS';
 };
 
 @Injectable()
