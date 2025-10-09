@@ -4,8 +4,8 @@ import { IsEnum, IsNotEmpty } from 'class-validator';
 
 
 export class SetRoleDto {
-  @ApiProperty({ example: 'ADMIN', enum: ['USER','ADMIN'] })
+  @ApiProperty({ example: 'ADMIN', enum: ['USER','ADMIN','PORTERO'] })
   @IsEnum(Role)
   @IsNotEmpty()
-  role: 'USER' | 'ADMIN';
+  role: 'USER' | 'ADMIN' | 'PORTERO';
 }

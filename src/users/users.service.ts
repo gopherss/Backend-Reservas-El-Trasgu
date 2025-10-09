@@ -60,6 +60,7 @@ export class UsersService {
   }
 
   async remove(id: number) {
+    await this.findOne(id);
     await this.prismaService.user.delete({ where: { id } });
     return { success: true };
   }
@@ -74,6 +75,7 @@ export class UsersService {
   }
 
   async setRole(id: number, setRoleDto: SetRoleDto) {
+    await this.findOne(id);
     const user = await this.prismaService.user.update({
       where: { id },
       data: { role: setRoleDto.role }
