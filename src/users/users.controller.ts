@@ -17,7 +17,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @Post()
-  @ApiOperation({ summary: 'Crear usuario (admin)' })
+  @ApiOperation({ summary: 'Crear usuario' })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
@@ -35,7 +35,7 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Actualizar usuario (admin)' })
+  @ApiOperation({ summary: 'Actualizar usuario' })
   update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }

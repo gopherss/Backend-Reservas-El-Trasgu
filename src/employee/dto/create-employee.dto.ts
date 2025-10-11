@@ -34,11 +34,6 @@ export class CreateEmployeeDto {
     @IsEnum(Cargo)
     cargo: Cargo;
 
-    @ApiProperty({ example: '2025-10-09T00:00:00.000Z', description: 'Fecha de ingreso del empleado', type: String })
-    @IsDate()
-    @Type(() => Date)
-    fecha_ingreso: Date;
-
     @ApiProperty({ example: true, description: 'Estado activo/inactivo del empleado, opcional' })
     @IsBoolean()
     @IsOptional()

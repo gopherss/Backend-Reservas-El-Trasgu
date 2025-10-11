@@ -21,7 +21,7 @@ export class EmployeeService {
 
   async findAll() {
     return await this.prismaService.employee.findMany({
-      select: { nombre: true, apellido: true, dni: true, telefono: true, correo: true, cargo: true, fecha_ingreso: true, estado: true, userId: true, createdAt: true }
+      select: { nombre: true, apellido: true, dni: true, telefono: true, correo: true, cargo: true, estado: true, userId: true, createdAt: true }
     });
   }
 

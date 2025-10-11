@@ -41,10 +41,10 @@ model Employee {
   telefono        String
   correo          String @unique
   cargo           Cargo
-  fecha_ingreso   DateTime
   estado          Boolean @default(true)
   userId          Int @unique
   user            User @relation(fields: [userId], references: [id])
+  reservasAsignadas Reservation[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -54,4 +54,89 @@ enum Cargo {
   ADMINISTRADOR 
   ANFITRION
   PORTERO
+}
+
+model Client {
+  id          Int  @id @default(autoincrement())
+  nombre      String 
+  apellido    String
+  correo      String @unique
+  celular     String
+  estado      Boolean @default(true)
+  tipoCliente TipoCliente @default(INVITADO)
+  reservas    Reservation[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum TipoCliente {
+  INVITADO
+  REGISTRADO
+}
+
+model Reservation {
+  id                Int            @id @default(autoincrement())
+  fechaReserva      DateTime
+  horaReserva       DateTime
+  cantidadPersonas  Int
+  alergias          String?
+  comentarios       String?
+  estado            EstadoReserva  @default(PENDIENTE)
+  motivoCancelacion String?
+  codigoQR          String?        @unique
+  fechaCreacion     DateTime       @default(now())
+  fechaConfirmacion DateTime?
+
+  clientId          Int
+  client            Client         @relation(fields: [clientId], references: [id])
+
+  hostId            Int?
+  host              Employee?      @relation(fields: [hostId], references: [id])
+
+  areaId            Int
+  area              Area           @relation(fields: [areaId], references: [id])
+
+  subareaId         Int
+  subarea           Subarea        @relation(fields: [subareaId], references: [id])
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+}
+
+enum EstadoReserva {
+  PENDIENTE
+  CONFIRMADA
+  CANCELADA
+  ATENDIDA
+}
+
+model Area {
+  id              Int             @id @default(autoincrement())
+  nombreArea      String
+  capacidadMaxima Int
+  consumoMinimo   Float?
+  descripcion     String?
+  estado          Boolean         @default(true)
+  fechaRegistro   DateTime        @default(now())
+
+  subareas        Subarea[]
+  reservas        Reservation[]
+
+  updatedAt       DateTime        @updatedAt
+}
+
+
+model Subarea {
+  id                Int             @id @default(autoincrement())
+  nombreSubarea     String
+  imagenReferencia  String?
+  estado            Boolean         @default(true)
+  fechaRegistro     DateTime        @default(now())
+  areaId            Int
+  area              Area            @relation(fields: [areaId], references: [id])
+
+  reservas          Reservation[]
+
+  updatedAt         DateTime        @updatedAt
 }
