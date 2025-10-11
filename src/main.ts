@@ -15,7 +15,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('El Trasgu API')
-    .setDescription('Documentacion de la API con Swagger - Proyecto Pedidos El Trasgu')
+    .setDescription('Documentacion de la API con Swagger - Proyecto Reservaciones El Trasgu')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
