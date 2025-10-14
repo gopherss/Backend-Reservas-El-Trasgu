@@ -1,7 +1,6 @@
-import { Cargo } from "@prisma/client";
-import { Type } from "class-transformer";
-import { IsBoolean, IsDate, IsEmail, IsEnum, IsInt, IsNotEmpty, IsOptional, IsPhoneNumber, IsPositive, IsString, MaxLength, minLength, MinLength } from "class-validator";
 import { ApiProperty } from '@nestjs/swagger';
+import { Cargo } from "@prisma/client";
+import { IsBoolean, IsEmail, IsEnum, IsInt, IsNotEmpty, IsOptional, IsPhoneNumber, IsPositive, IsString, MaxLength, MinLength } from "class-validator";
 
 export class CreateEmployeeDto {
     @ApiProperty({ example: 'Juan', description: 'Nombre del empleado' })
@@ -30,6 +29,12 @@ export class CreateEmployeeDto {
     @IsNotEmpty()
     correo: string;
 
+    
+    @ApiProperty({ example: 'supersecreto', description: 'Contraseña del usuario asociado' })
+    @IsString()
+    @MinLength(6)
+    password: string;
+
     @ApiProperty({ enum: Cargo, description: 'Cargo del empleado' })
     @IsEnum(Cargo)
     cargo: Cargo;
@@ -38,11 +43,5 @@ export class CreateEmployeeDto {
     @IsBoolean()
     @IsOptional()
     estado: boolean;
-
-    @ApiProperty({ example: 1, description: 'ID del usuario asociado al empleado' })
-    @IsInt()
-    @IsNotEmpty()
-    @IsPositive()
-    userId: number;
 
 }

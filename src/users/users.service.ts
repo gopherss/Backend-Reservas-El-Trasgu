@@ -1,35 +1,17 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';  
-import { CreateUserDto, ResetPasswordDto, SetRoleDto, UpdateUserDto } from './dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { ResetPasswordDto, SetRoleDto, UpdateUserDto } from './dto';
 
 @Injectable()
 export class UsersService {
 
   constructor(private readonly prismaService: PrismaService) { }
 
-  async create(createUserDto: CreateUserDto): Promise<Omit<CreateUserDto, 'password'>> {
-    const exists = await this.prismaService.user.findUnique({ where: { user: createUserDto.user } });
-    if (exists) throw new BadRequestException('Email ya registrado');
-
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const user = await this.prismaService.user.create({
-      data: {
-        user: createUserDto.user,
-        password: hashedPassword,
-        role: createUserDto.role ?? 'USER',
-      },
-    });
-
-    const { password: _, ...userWithoutPassword } = user;
-
-    return userWithoutPassword;
-  }
-
   async findAll() {
     return await this.prismaService.user.findMany({
       select: {
-        id: true, user: true, role: true, status: true, updatedAt: true
+        id: true, user: true, role: true, status: true, createdAt: true, updatedAt: true
       }
     });
   }
@@ -37,7 +19,7 @@ export class UsersService {
   async findOne(id: number) {
     const user = await this.prismaService.user.findUnique({
       where: { id },
-      select: { id: true, user: true, role: true, status: true, updatedAt: true }
+      select: { id: true, user: true, role: true, status: true, createdAt: true, updatedAt: true }
     });
     if (!user) throw new NotFoundException('Usuario no encontrado');
     return user;

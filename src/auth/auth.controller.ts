@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { LoginDto, LogoutDto, RefreshTokenDto, RegisterDto } from './dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthService } from './auth.service';
+import { LoginDto, LogoutDto, RefreshTokenDto } from './dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -11,14 +11,6 @@ export class AuthController {
         private readonly authService: AuthService
     ) { }
 
- /*   @Post('register')
-    @ApiOperation({ summary: 'Registrar nuevo usuario' })
-    @ApiResponse({ status: 201, description: 'Usuario registrado exitosamente' })
-    @ApiResponse({ status: 400, description: 'Datos inválidos' })
-    register(@Body() registerDto: RegisterDto) {
-        return this.authService.register(registerDto);
-    } */
- 
     @Post('login')
     @ApiOperation({ summary: 'Iniciar sesión' })
     @ApiResponse({ status: 200, description: 'Usuario autenticado, devuelve accessToken y refreshToken' })

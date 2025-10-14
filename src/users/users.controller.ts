@@ -1,11 +1,12 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateUserDto, SetRoleDto, UpdateUserDto } from './dto';
-import { UsersService } from './users.service';
-import { RolesGuard } from 'src/common/guards/roles.guard';
-import { Roles } from 'src/common/decorators/roles.decorator';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { CreateUserDto, SetRoleDto, UpdateUserDto } from './dto';
+import { UsersService } from './users.service';
+import { UserResponseDto } from './dto/user-response.dto';
 
 
 @ApiTags('Users')
@@ -16,20 +17,16 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
-  @Post()
-  @ApiOperation({ summary: 'Crear usuario' })
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
   @Get()
   @ApiOperation({ summary: 'Listar usuarios' })
+  @ApiResponse({ type: [UserResponseDto] })
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener usuario por id' })
+  @ApiResponse({ type: UserResponseDto })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findOne(+id);
   }

@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto, UpdateEmployeeDto } from './dto';
@@ -23,6 +23,7 @@ export class EmployeeController {
 
   @Get()
   @ApiOperation({ summary: 'Lista Empleados' })
+  @ApiResponse({ type: [CreateEmployeeDto] })
   findAll() {
     return this.employeeService.findAll();
   }

@@ -6,7 +6,7 @@ import { PrismaService } from 'src/prisma/prisma.service'; // Necesario para bus
 // Define el tipo de Payload que se espera del token
 type JwtPayload = {
     sub: number;
-    email: string;
+    user: string;
     role: 'USER' | 'ADMIN' | 'PORTRESS';
 };
 
@@ -22,10 +22,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
   async validate(payload: JwtPayload) {
     // 1. Opcional: buscar el usuario en la BD (para asegurar que sigue activo)
-    const user = await this.prismaService.user.findUnique({ where: { id: payload.sub } });
+    const userExits = await this.prismaService.user.findUnique({ where: { id: payload.sub } });
     
     // 2. Si el usuario no existe o está bloqueado
-    if (!user || !user.status) {
+    if (!userExits || !userExits.status) {
         throw new UnauthorizedException();
     }
     

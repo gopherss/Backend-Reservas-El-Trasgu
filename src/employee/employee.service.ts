@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateEmployeeDto, UpdateEmployeeDto } from './dto';
+import { Role } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class EmployeeService {
@@ -8,15 +10,47 @@ export class EmployeeService {
     private readonly prismaService: PrismaService
   ) { }
 
-  async create(createEmployeeDto: CreateEmployeeDto): Promise<Omit<CreateEmployeeDto, 'id'>> {
-    await this.validateEmployee(createEmployeeDto.correo, createEmployeeDto.dni)
-    const newEmployee = await this.prismaService.employee.create({
-      data: { ...createEmployeeDto }
-    })
+   async create(createEmployeeDto: Readonly<CreateEmployeeDto>) {
+    const { correo, dni, password, cargo, ...rest } = createEmployeeDto;
+    await this.validateEmployee(correo, dni);
 
-    const { id: _, ...employeeWithouId } = newEmployee;
+    // Crear usuario y empleado en transacción
+    const result = await this.prismaService.$transaction(async (tx) => {
+      const role = this.mapCargoToRole(cargo);
 
-    return employeeWithouId;
+      const hash = await bcrypt.hash(password, 10);
+
+      const user = await tx.user.create({
+        data: {
+          user: correo,
+          password: hash,
+          role,
+        },
+      });
+
+      const employee = await tx.employee.create({
+        data: {
+          ...rest,
+          correo,
+          dni,
+          cargo,
+          telefono: createEmployeeDto.telefono,
+          userId: user.id,
+        },
+      });
+
+      return {
+        message: 'Empleado y usuario creados correctamente',
+        employee,
+        user: {
+          id: user.id,
+          user: user.user,
+          role: user.role,
+        },
+      };
+    });
+
+    return result;
   }
 
   async findAll() {
@@ -51,14 +85,28 @@ export class EmployeeService {
     return await this.prismaService.employee.delete({ where: { id } });
   }
 
+  
+  private mapCargoToRole(cargo: string): Role {
+    switch (cargo) {
+      case 'ADMINISTRADOR':
+        return Role.ADMIN;
+      case 'PORTERO':
+        return Role.PORTRESS;
+      default:
+        return Role.USER;
+    }
+  }
 
-  private async validateEmployee(correo: string, dni: string) {
-    const emailExists = await this.prismaService.employee.findUnique({ where: { correo: correo } });
-    if (emailExists) throw new BadRequestException('El email ya está registrado');
+   private async validateEmployee(correo: string, dni: string) {
+    const [emailExists, dniExists, userExists] = await Promise.all([
+      this.prismaService.employee.findUnique({ where: { correo } }),
+      this.prismaService.employee.findUnique({ where: { dni } }),
+      this.prismaService.user.findUnique({ where: { user: correo } }),
+    ]);
 
-    const dniExists = await this.prismaService.employee.findUnique({ where: { dni: dni } });
-    if (dniExists) throw new BadRequestException('El dni ya está regisitrado');
-
+    if (emailExists) throw new BadRequestException('El correo ya está registrado como empleado.');
+    if (dniExists) throw new BadRequestException('El DNI ya está registrado.');
+    if (userExists) throw new BadRequestException('Ya existe un usuario con este correo.');
   }
 
   private async findById(id: number) {

@@ -1,21 +1,43 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ClientService } from './client.service';
-import { CreateClientDto } from './dto/create-client.dto';
-import { UpdateClientDto } from './dto/update-client.dto';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateClientDto, RegisterClientDto, UpdateClientDto } from './dto';
 
 @ApiTags('Clients')
 @Controller('client')
 export class ClientController {
   constructor(private readonly clientService: ClientService) { }
 
-  @ApiOperation({ summary: 'Registrar un nuevo cliente' })
+  @ApiOperation({ summary: 'Crear un nuevo cliente' })
   @ApiBody({ type: CreateClientDto })
-  @ApiResponse({ status: 201, description: 'Cliente registrado exitosamente' })
+  @ApiResponse({ status: 201, description: 'Cliente creado exitosamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos o duplicados' })
   @Post()
   create(@Body() createClientDto: CreateClientDto) {
     return this.clientService.create(createClientDto);
+  }
+
+  @ApiOperation({ summary: 'Registrar un nuevo cliente' })
+  @ApiBody({ type: RegisterClientDto })
+  @ApiResponse({ status: 201, description: 'Cliente registrado exitosamente' })
+  @ApiResponse({ status: 400, description: 'Datos inválidos o duplicados' })
+  @Post("register")
+  createRegistered(@Body() registerClientDto: RegisterClientDto) {
+    return this.clientService.registerClient(registerClientDto);
+  }
+
+  @ApiOperation({ summary: 'Actualizar cliente invitado a registrado' })
+  @ApiBody({ type: RegisterClientDto })
+  @ApiResponse({ status: 200, description: 'Cliente actualizado a registrado' })
+  @Post('upgrade')
+  upgradeClient(@Body() dto: RegisterClientDto) {
+    return this.clientService.upgradeClientToRegistered(dto);
+  }
+
+  @Get(':search')
+  @ApiOperation({ summary: 'buscar empleado por, nombre | apellido' })
+  findByEmployee(@Param('search') search: string) {
+    return this.clientService.findByClient(search);
   }
 
   @ApiOperation({ summary: 'Listar todos los clientes' })
